@@ -15,6 +15,10 @@ def user_login(context, data_dict):
     }
     model = context['model']
     user = model.User.get(data_dict['id'])
+    
+    # Try to get user by email if not found by username
+    if not user:
+        user = model.User.by_email(data_dict['id'])
 
     if not user:
         return generic_error_message
@@ -23,7 +27,7 @@ def user_login(context, data_dict):
 
     if data_dict[u'password']:
         identity = {
-            u'login': user['name'],
+            u'login': data_dict['id'],  # Use the original login (username or email)
             u'password': data_dict[u'password']
         }
 
