@@ -4,13 +4,18 @@ It adds a new `user_login` action to the CKAN API so that you can call it for au
 
 * Method: POST
 * Endpoint: `http://ckan:5000/api/3/action/user_login`
-* Body: `{"id": <username>, "password": <password>}`
+* Body: `{"id": <username_or_email>, "password": <password>}`
+
+The `id` field accepts either the username or email address of the user.
 
 Example of using it in the NodeJS app:
 
 ```javascript
 const loginViaCKAN = async function(body) {
    // Call `user_login` action here
+   // body can contain either username or email in the 'id' field
+   // Example: {"id": "username", "password": "password"}
+   // or: {"id": "user@example.com", "password": "password"}
 }
 
 app.post("/login", async (req, res) => {
@@ -20,7 +25,7 @@ app.post("/login", async (req, res) => {
       req.session.ckan_user = loggedUser
       res.redirect('/dashboard')
    } else {
-      req.flash('error_messages', 'Invalid username or password.')
+      req.flash('error_messages', 'Invalid username/email or password.')
       res.redirect('/login')
    }
 })
