@@ -70,3 +70,27 @@ To install ckanext-auth:
 4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
      sudo service apache2 reload
+
+## Debugging
+
+If email login is not working, you can:
+
+1. **Check the logs**: The extension now includes debug logging. Enable debug mode in your CKAN config and check the logs for messages starting with `user_login:`.
+
+2. **Use the debug script**: Run the included debug script to test login:
+   ```bash
+   python debug_login.py https://your-ckan-site.com user@example.com password
+   ```
+
+3. **Verify email in database**: Make sure the user's email is correctly stored in the CKAN database.
+
+4. **Test with username**: Try logging in with the username instead of email to isolate the issue.
+
+## Troubleshooting
+
+**Common issues:**
+
+- **Email not found**: The user's email might not be set in their profile
+- **Case sensitivity**: Some CKAN versions are case-sensitive for emails
+- **Email validation**: Make sure the email format is correct
+- **User status**: Ensure the user account is active
