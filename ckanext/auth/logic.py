@@ -18,7 +18,9 @@ def user_login(context, data_dict):
     
     # Try to get user by email if not found by username
     if not user:
-        user = model.User.by_email(data_dict['id'])
+        users_by_email = model.User.by_email(data_dict['id'])
+        if users_by_email:
+            user = users_by_email[0]  # Get the first user from the list
 
     if not user:
         return generic_error_message
