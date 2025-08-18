@@ -1,4 +1,4 @@
-Use CKAN  as an auth service in your application.
+Use CKAN as an auth service in your application.
 
 It adds a new `user_login` action to the CKAN API so that you can call it for authentication of a user from a third party application:
 
@@ -6,7 +6,23 @@ It adds a new `user_login` action to the CKAN API so that you can call it for au
 * Endpoint: `http://ckan:5000/api/3/action/user_login`
 * Body: `{"id": <username_or_email>, "password": <password>}`
 
-The `id` field accepts either the username or email address of the user.
+The `id` field accepts either the username or email address of the user. This leverages CKAN's built-in authentication system that supports both login methods.
+
+## Usage Examples
+
+**Login with username:**
+```bash
+curl -X POST http://ckan:5000/api/3/action/user_login \
+  -H "Content-Type: application/json" \
+  -d '{"id": "johndoe", "password": "mypassword"}'
+```
+
+**Login with email:**
+```bash
+curl -X POST http://ckan:5000/api/3/action/user_login \
+  -H "Content-Type: application/json" \
+  -d '{"id": "john@example.com", "password": "mypassword"}'
+```
 
 Example of using it in the NodeJS app:
 

@@ -13,30 +13,24 @@ def user_login(context, data_dict):
         },
         u'error_summary': {_(u'auth'): _(u'Incorrect username or password')}
     }
-    model = context['model']
     
-    # Try to get user by username first
-    user = model.User.get(data_dict['id'])
-    
-    # If not found by username, try to find by email
-    if not user:
-        user = model.User.by_email(data_dict['id'])
-    
-    if not user:
-        return generic_error_message
-
-    user = user.as_dict()
-
     if data_dict[u'password']:
         identity = {
-            u'login': user['name'],
+            u'login': data_dict['id'],  # Pass the original id (username or email)
             u'password': data_dict[u'password']
         }
 
         auth = authenticator.UsernamePasswordAuthenticator()
-        authUser = auth.authenticate(context, identity)
+        authResult = auth.authenticate(context, identity)
 
-        if authUser != user['name']:
+        if authResult is None:
             return generic_error_message
         else:
-            return user
+            # Extract user ID from auth result (format: "user_id,1")
+            user_id = authResult.split(',')[0]
+            model = context['model']
+            user = model.User.get(user_id)
+            if user:
+                return user.as_dict()
+            else:
+                return generic_error_message
