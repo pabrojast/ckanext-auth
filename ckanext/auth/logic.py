@@ -1,3 +1,4 @@
+import logging
 import ckan.logic as logic
 import ckan.lib.authenticator as authenticator
 from ckan.plugins import toolkit as tk
@@ -5,7 +6,7 @@ from ckan.common import _
 
 _check_access = logic.check_access
 
-log = tk.get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 def user_login(context, data_dict):
