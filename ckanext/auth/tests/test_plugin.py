@@ -10,55 +10,55 @@ class TestUserLogin:
         # Mock context and model
         context = {'model': Mock()}
         user_mock = Mock()
+        user_mock.name = 'testuser'
         user_mock.as_dict.return_value = {'name': 'testuser', 'email': 'test@example.com'}
-        context['model'].User.get.return_value = user_mock
+        context['model'].User.by_name.return_value = user_mock
         
         data_dict = {'id': 'testuser', 'password': 'testpass'}
         
         # Mock authenticator
         with pytest.patch('ckanext.auth.logic.authenticator') as mock_auth:
-            auth_instance = Mock()
-            auth_instance.authenticate.return_value = 'user123,1'  # user_id,status format
-            mock_auth.UsernamePasswordAuthenticator.return_value = auth_instance
+            mock_auth.ckan_authenticator.return_value = user_mock
             
             result = logic.user_login(context, data_dict)
             
             assert result == {'name': 'testuser', 'email': 'test@example.com'}
-            context['model'].User.get.assert_called_once_with('user123')
+            context['model'].User.by_name.assert_called_once_with('testuser')
     
     def test_user_login_with_email(self):
         """Test login with email"""
         # Mock context and model
         context = {'model': Mock()}
         user_mock = Mock()
+        user_mock.name = 'testuser'
         user_mock.as_dict.return_value = {'name': 'testuser', 'email': 'test@example.com'}
-        context['model'].User.get.return_value = user_mock
+        context['model'].User.by_name.return_value = None
+        context['model'].User.by_email2.return_value = user_mock
         
         data_dict = {'id': 'test@example.com', 'password': 'testpass'}
         
         # Mock authenticator
         with pytest.patch('ckanext.auth.logic.authenticator') as mock_auth:
-            auth_instance = Mock()
-            auth_instance.authenticate.return_value = 'user123,1'  # user_id,status format
-            mock_auth.UsernamePasswordAuthenticator.return_value = auth_instance
+            mock_auth.ckan_authenticator.return_value = user_mock
             
             result = logic.user_login(context, data_dict)
             
             assert result == {'name': 'testuser', 'email': 'test@example.com'}
-            context['model'].User.get.assert_called_once_with('user123')
+            context['model'].User.by_email2.assert_called_once_with('test@example.com')
     
     def test_user_login_authentication_failed(self):
         """Test login with authentication failure"""
         # Mock context and model
         context = {'model': Mock()}
+        user_mock = Mock()
+        user_mock.name = 'testuser'
+        context['model'].User.by_name.return_value = user_mock
         
         data_dict = {'id': 'testuser', 'password': 'wrongpass'}
         
         # Mock authenticator
         with pytest.patch('ckanext.auth.logic.authenticator') as mock_auth:
-            auth_instance = Mock()
-            auth_instance.authenticate.return_value = None  # Authentication failed
-            mock_auth.UsernamePasswordAuthenticator.return_value = auth_instance
+            mock_auth.ckan_authenticator.return_value = None  # Authentication failed
             
             result = logic.user_login(context, data_dict)
             
@@ -69,15 +69,14 @@ class TestUserLogin:
         """Test when authentication succeeds but user not found in database"""
         # Mock context and model
         context = {'model': Mock()}
-        context['model'].User.get.return_value = None  # User not found
+        context['model'].User.by_name.return_value = None  # User not found
+        context['model'].User.by_email2.return_value = None
         
         data_dict = {'id': 'testuser', 'password': 'testpass'}
         
         # Mock authenticator
         with pytest.patch('ckanext.auth.logic.authenticator') as mock_auth:
-            auth_instance = Mock()
-            auth_instance.authenticate.return_value = 'user123,1'
-            mock_auth.UsernamePasswordAuthenticator.return_value = auth_instance
+            mock_auth.ckan_authenticator.return_value = Mock()
             
             result = logic.user_login(context, data_dict)
             
